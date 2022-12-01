@@ -6,9 +6,14 @@ until eframe upstream gets android support
 ## Usage
 
 ```rust
-use egui_android::run_android;
 use egui_android::SimpleApp;
 use egui;
+
+#[cfg(target_os = "android")]
+use egui_android::run_android;
+
+#[cfg(target_os = "android")]
+use winit::platform::android::activity::AndroidApp;
 
 impl SimpleApp for MyApp {
     fn update_simple(&mut self, ctx: &egui::Context) {
@@ -30,6 +35,10 @@ pub fn android_main(app: winit::platform::android::activity::AndroidApp) {
 Add these things to your Cargo.toml:
 
 ```toml
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.11.1"
+winit = { git="https://github.com/rust-windowing/winit.git", default-features = false, features = ["android-native-activity"] }
+
 [package.metadata.android]
 package = "com.myapp"
 apk_name = "myapp"
