@@ -52,7 +52,7 @@ label = "MyApp"
 Install cargo-apk, then build and install:
 
 ```bash
-$ cargo apk build && adb install target/debug/apk/damus.apk
+$ cargo apk build && adb install target/debug/apk/myapp.apk
 ```
 
 ## Credits
