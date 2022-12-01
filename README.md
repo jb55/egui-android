@@ -5,7 +5,7 @@ until eframe upstream gets android support
 
 ## Usage
 
-```
+```rust
 use egui_android::run_android;
 use egui_android::SimpleApp;
 
