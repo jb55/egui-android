@@ -1,8 +1,7 @@
 #[cfg(target_os = "android")]
 pub mod android;
+#[cfg(target_os = "android")]
+pub use crate::android::run_android;
 
-mod app;
-mod event;
-
-pub use app::Damus;
-pub use event::Event;
+pub mod app;
+pub use crate::app::SimpleApp;

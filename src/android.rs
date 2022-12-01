@@ -1,9 +1,9 @@
 // TODO: replace all of this old stuff with eframe once it supports
 //       android properly
-use crate::app::Damus;
 
-use ::egui::FontDefinitions;
+use crate::SimpleApp;
 use chrono::Timelike;
+use egui::FontDefinitions;
 use egui_wgpu_backend::{RenderPass, ScreenDescriptor};
 use egui_winit_platform::{Platform, PlatformDescriptor};
 use log::{error, info, warn};
@@ -13,8 +13,8 @@ use wgpu::CompositeAlphaMode;
 use winit::event::Event::*;
 use winit::event_loop::ControlFlow;
 use winit::event_loop::EventLoop;
+use winit::platform::android::activity::AndroidApp;
 
-#[cfg(target_os = "android")]
 use winit::{
     event::StartCause, platform::android::EventLoopBuilderExtAndroid,
     platform::run_return::EventLoopExtRunReturn,
@@ -48,23 +48,15 @@ impl epi::backend::RepaintSignal for ExampleRepaintSignal {
     }
 }
 
-#[cfg(target_os = "android")]
-#[no_mangle]
-pub fn android_main(app: winit::platform::android::activity::AndroidApp) {
-    #[cfg(debug_assertions)]
-    {
-        std::env::set_var("RUST_BACKTRACE", "full");
-        android_logger::init_once(
-            android_logger::Config::default().with_min_level(log::Level::Trace),
-        );
-    }
+pub fn run_android(android_app: AndroidApp, app: Box<dyn SimpleApp>) {
     let event_loop = winit::event_loop::EventLoopBuilder::<WinitEvent>::with_user_event()
-        .with_android_app(app)
+        .with_android_app(android_app)
         .build();
-    run_evloop(event_loop);
+
+    run_evloop(event_loop, app);
 }
 
-pub fn run_evloop(mut event_loop: EventLoop<WinitEvent>) {
+pub fn run_evloop(mut event_loop: EventLoop<WinitEvent>, mut app: Box<dyn SimpleApp>) {
     //'Cannot get the native window, it's null and will always be null before Event::Resumed and after Event::Suspended. Make sure you only call this function between those events.', ..../winit-c2fdb27092aba5a7/418cc44/src/platform_impl/android/mod.rs:1028:13
     warn!("Winit build window at {} line {}", file!(), line!());
     let window = winit::window::WindowBuilder::new()
@@ -229,8 +221,6 @@ pub fn run_evloop(mut event_loop: EventLoop<WinitEvent>) {
 
     warn!("DemoWindows default at {} line {}", file!(), line!());
     // Display the demo application that ships with egui.
-    let mut app = Damus::new();
-    app.add_test_events();
 
     let start_time = Instant::now();
 
@@ -272,7 +262,7 @@ pub fn run_evloop(mut event_loop: EventLoop<WinitEvent>) {
                 platform.begin_frame();
 
                 // Draw the demo application.
-                app.ui(&platform.context());
+                app.update_simple(&mut platform.context());
 
                 // End the UI frame. We could now handle the output and draw the UI with the backend.
                 let full_output = platform.end_frame(Some(&window));
