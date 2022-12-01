@@ -8,9 +8,10 @@ until eframe upstream gets android support
 ```rust
 use egui_android::run_android;
 use egui_android::SimpleApp;
+use egui;
 
 impl SimpleApp for MyApp {
-    fn update_simple(&mut self, ctx: &Context) {
+    fn update_simple(&mut self, ctx: &egui::Context) {
         self.mobile_ui(ctx)
     }
 }
